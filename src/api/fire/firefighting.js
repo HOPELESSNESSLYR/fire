@@ -1,6 +1,6 @@
 import request from '@/utils/request'
 
-// 查询灭火器管理列表
+// 查询消防设施管理列表
 export function listFirefighting(query) {
   return request({
     url: '/fire/firefighting/list',
@@ -9,7 +9,7 @@ export function listFirefighting(query) {
   })
 }
 
-// 查询灭火器管理详细
+// 查询消防设施管理详细
 export function getFirefighting(fireId) {
   return request({
     url: '/fire/firefighting/' + fireId,
@@ -17,7 +17,7 @@ export function getFirefighting(fireId) {
   })
 }
 
-// 新增灭火器管理
+// 新增消防设施管理
 export function addFirefighting(data) {
   return request({
     url: '/fire/firefighting',
@@ -26,7 +26,7 @@ export function addFirefighting(data) {
   })
 }
 
-// 修改灭火器管理
+// 修改消防设施管理
 export function updateFirefighting(data) {
   return request({
     url: '/fire/firefighting',
@@ -35,10 +35,18 @@ export function updateFirefighting(data) {
   })
 }
 
-// 删除灭火器管理
+// 删除消防设施管理
 export function delFirefighting(fireId) {
   return request({
     url: '/fire/firefighting/' + fireId,
     method: 'delete'
+  })
+}
+
+export function qrImg(data) {
+  return request({
+    url: '/fire/firefighting/code/toStream',
+    method: 'post',
+    data: data
   })
 }
