@@ -126,8 +126,18 @@
           plain
           icon="el-icon-full-screen"
           size="mini"
+          :disabled="single"
           @click="qrGenerate"
-        >二维码</el-button>
+        >生成二维码</el-button>
+      </el-col>
+      <el-col :span="1.5">
+        <el-button
+          type="primary"
+          plain
+          icon="el-icon-full-screen"
+          size="mini"
+          @click="qrGenerateList"
+        >批量生成二维码</el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button
@@ -176,16 +186,21 @@
 
     <el-table v-loading="loading" :data="firefightingList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="消防设施ID" align="center" prop="fireId" />
+      <el-table-column label="序号" type="index" align="center" prop="index">
+        <template slot-scope="scope">
+          <span>{{(queryParams.pageNum - 1) * queryParams.pageSize + scope.$index + 1}}</span>
+        </template>
+      </el-table-column>
+      <!-- <el-table-column label="消防设施ID" align="center" prop="fireId" /> -->
       <el-table-column label="设备名称" align="center" prop="deviceName" />
       <el-table-column label="设备型号" align="center" prop="deviceModel" />
       <el-table-column label="放置位置" align="center" prop="locate" />
-      <el-table-column label="生产日期" align="center" prop="productDate" width="180">
+      <el-table-column label="生产日期" align="center" prop="productDate" width="110">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.productDate, '{y}-{m}-{d}') }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="安装时间" align="center" prop="installTime" width="180">
+      <el-table-column label="安装时间" align="center" prop="installTime" width="110">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.installTime, '{y}-{m}-{d}') }}</span>
         </template>
@@ -197,17 +212,23 @@
           <image-preview :src="scope.row.image" :width="50" :height="50"/>
         </template>
       </el-table-column>
-      <el-table-column label="二维码内容" align="center" prop="qrContent" />
+      <el-table-column label="二维码内容" align="center" prop="qrContent" width="120" />
       <el-table-column label="灭火器ID" align="center" prop="killFireId" />
-      <el-table-column label="消火栓ID" align="center" prop="fireHydrantId" />
+      <!-- <el-table-column label="消火栓ID" align="center" prop="fireHydrantId" />
       <el-table-column label="水泵房ID" align="center" prop="pumpRoomId" />
-      <el-table-column label="阀组间ID" align="center" prop="groupRoomId" />
+      <el-table-column label="阀组间ID" align="center" prop="groupRoomId" /> -->
       <el-table-column label="设备分组" align="center" prop="group" />
       <el-table-column label="检查记录" align="center" prop="checkRecords" />
       <el-table-column label="维护记录" align="center" prop="maintainRecords" />
       <el-table-column label="报警数据" align="center" prop="alarmData" />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
+          <!-- <el-button
+            size="mini"
+            type="text"
+            icon="el-icon-full-screen"
+            @click="qrGenerate(scope.row)"
+          >生成二维码</el-button> -->
           <el-button
             size="mini"
             type="text"
@@ -229,8 +250,9 @@
           <div class="demo-image__preview">
             <el-image 
               style="width: 100%; height: 100%"
-              :src="url" 
-              :preview-src-list="srcList">
+              :src="scope.row.qrcode" 
+              :preview-src-list="srcList"
+              @load="onImageLoad">
               <div slot="error" class="image-slot">
                 <i class="el-icon-picture-outline"></i>
               </div>
@@ -319,14 +341,15 @@
 </template>
 
 <script>
-import { listFirefighting, getFirefighting, delFirefighting, addFirefighting, updateFirefighting, qrImg} from "@/api/fire/firefighting";
+import { listFirefighting, getFirefighting, delFirefighting, addFirefighting, updateFirefighting, qrImg, qrImgList} from "@/api/fire/firefighting";
 
 export default {
   name: "Firefighting",
   data() {
     return {
-      url:'',
+      url:[],
       srcList: [],
+      index:"",
       qrcode:"",
       // 遮罩层
       loading: true,
@@ -367,6 +390,7 @@ export default {
         checkRecords: null,
         maintainRecords: null,
         alarmData: null,
+        qrcode:null
       },
       // 表单参数
       form: {},
@@ -417,7 +441,8 @@ export default {
         createBy: null,
         createTime: null,
         updateBy: null,
-        updateTime: null
+        updateTime: null,
+        qrcode:null
       };
       this.resetForm("form");
     },
@@ -435,14 +460,55 @@ export default {
     handleSelectionChange(selection) {
       console.log(JSON.stringify(selection))
       this.ids = selection.map(item => item.fireId)
+      console.log(this.ids)
       this.single = selection.length!==1
       this.multiple = !selection.length
+
+      this.index = this.firefightingList.findIndex(item => item.fireId == this.ids);
     },
-    qrGenerate(){
-      qrImg(this.firefightingList[0].qrContent).then(response => {
-        this.url = "data:img/jpg;base64," + response;
-        this.srcList= ["data:img/jpg;base64," + response];
+    qrGenerate(row){
+      // const fireId = row.fireId || this.ids
+      // console.log(fireId)
+      console.log(JSON.stringify( this.firefightingList))
+      console.log(JSON.stringify( row))
+
+      qrImg(this.firefightingList[this.index].qrContent).then(response => {
+        // this.$nextTick(() => {
+        // console.log(response)
+        this.url[0]="data:img/jpg;base64,"+ response;
+        this.firefightingList[this.index].qrcode="data:img/jpg;base64,"+ response;
+        row.qrcode = this.url[0]
+        console.log(row.qrcode)
+        console.log(this.firefightingList[this.index].qrcode)
+        this.srcList= [ row.qrcode];
       });
+    // })
+    },
+    onImageLoad() {   // 触发图片预览
+      this.$el.querySelector('.el-image__inner').click();
+    },
+    qrGenerateList(row){
+      // 传入 二维码内容 列表
+      var qrContents=[]
+      for(let i=0;i<this.ids.length;i++){
+        qrContents[i] =this.firefightingList[i].qrContent
+        console.log(qrContents[i])
+      }
+      console.log(JSON.stringify( qrContents ))
+      
+      qrImgList(qrContents).then(response =>{
+        for(let i=0;i<this.ids.length;i++){
+          this.url[i] = "data:img/jpg;base64,"+ response[i];
+          this.firefightingList[i].qrcode = this.url[i]
+          this.srcList[i]= this.url[i]
+          // this.srcList= [ row.qrcode];
+        }
+        // row.qrcode = this.url
+          console.log(JSON.stringify(this.url))
+          console.log(JSON.stringify(row.qrcode))
+          console.log(JSON.stringify(this.srcList))
+      })
+
     },
     /** 新增按钮操作 */
     handleAdd() {

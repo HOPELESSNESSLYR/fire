@@ -50,3 +50,11 @@ export function qrImg(data) {
     data: data
   })
 }
+
+export function qrImgList(data) {
+  return request({
+    url: '/fire/firefighting/code/list',
+    method: 'post',
+    data: data
+  })
+}
