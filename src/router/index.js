@@ -75,6 +75,20 @@ export const constantRoutes = [
   //   ]
   // },
   {
+    path: '',
+    component: Layout,
+    redirect: '/firefighting',
+    hidden: true,
+    children: [
+      {
+        path: 'firefighting',
+        component: () => import('@/views/fire/firefighting'),
+        name: 'firefighting',
+        meta: { title: '消防设备管理', icon: 'table'}
+      }
+    ]
+  },
+  {
     path: '/user',
     component: Layout,
     hidden: true,
