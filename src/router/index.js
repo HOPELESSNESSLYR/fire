@@ -85,7 +85,13 @@ export const constantRoutes = [
         component: () => import('@/views/fire/firefighting'),
         name: 'firefighting',
         meta: { title: '消防设备管理', icon: 'table'}
-      }
+      },
+      // {
+      //   path: 'firefighting',
+      //   component: () => import('@/views/fire/record'),
+      //   name: 'firerecord',
+      //   meta: { title: '检查记录', icon: 'table'}
+      // }
     ]
   },
   {
