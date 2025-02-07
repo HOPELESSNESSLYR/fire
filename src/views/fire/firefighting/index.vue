@@ -25,6 +25,14 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
+      <el-form-item label="状态是否有效" prop="status">
+        <el-input
+          v-model="queryParams.status"
+          placeholder="请输入状态"
+          clearable
+          @keyup.enter.native="handleQuery"
+        />
+      </el-form-item>
       <!--      <el-form-item label="设备分组" prop="group">
         <el-input
           v-model="queryParams.group"
@@ -64,7 +72,7 @@
     </el-form>
 
     <el-row :gutter="10" class="mb8">
-      <!-- <el-col :span="1.5">
+      <el-col :span="1.5">
         <el-button
           type="warning"
           plain
@@ -73,7 +81,7 @@
           :disabled="single"
           @click="qrGenerate"
         >生成二维码</el-button>
-      </el-col> -->
+      </el-col>
       <el-col :span="1.5">
         <el-button
           type="success"
@@ -82,6 +90,7 @@
           size="mini"
           :disabled="multiple"
           @click="qrGenerateList"
+          v-hasPermi="['fire:firefighting:qrcode']"
         >批量生成二维码</el-button>
       </el-col>
       <el-col :span="1.5">
@@ -114,7 +123,7 @@
           @click="handleUpdate"
           v-hasPermi="['fire:firefighting:edit']"
         >修改</el-button>
-      </el-col>
+      </el-col> -->
       <el-col :span="1.5">
         <el-button
           type="danger"
@@ -125,7 +134,7 @@
           @click="handleDelete"
           v-hasPermi="['fire:firefighting:remove']"
         >删除</el-button>
-      </el-col> -->
+      </el-col>
       <el-col :span="1.5">
         <el-button
           type="info"
@@ -149,7 +158,9 @@
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
-    <el-table v-loading="loading" :data="firefightingList" @selection-change="handleSelectionChange" :style="tabStyle">
+    <!-- <el-table v-loading="loading" :data="firefightingList" @selection-change="handleSelectionChange" :style="tabStyle"> -->
+      
+    <el-table v-loading="loading" :data="firefightingList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="序号" type="index" align="center" prop="index">
         <template slot-scope="scope">
@@ -188,10 +199,10 @@
       <el-table-column label="水泵房ID" align="center" prop="pumpRoomId" />
       <el-table-column label="阀组间ID" align="center" prop="groupRoomId" />
       <el-table-column label="设备分组" align="center" prop="group" />
-      <el-table-column label="检查记录" align="center" prop="checkRecords" width="95" /> -->
+      <el-table-column label="检查记录" align="center" prop="checkRecords" width="95" />
       <el-table-column label="维护记录" align="center" prop="maintainRecords" />
-      <el-table-column label="报警数据" align="center" prop="alarmData" />
-      <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
+      <el-table-column label="报警数据" align="center" prop="alarmData" /> -->
+      <!-- <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
             size="mini"
@@ -215,7 +226,7 @@
             v-hasPermi="['fire:firefighting:remove']"
           >删除</el-button>
         </template>
-      </el-table-column>
+      </el-table-column> -->
       <el-table-column label="二维码" align="center" prop="qrcode">
         <template slot-scope="scope">
           <div class="demo-image__preview">
@@ -377,13 +388,13 @@
 
     </el-dialog>
 
-
   </div>
 </template>
 
 <script>
 import { listFirefighting, getFirefighting, delFirefighting, addFirefighting, updateFirefighting, qrImg, qrImgList} from "@/api/fire/firefighting";
 import { getToken, setToken, removeToken } from '@/utils/auth'
+import { addAlert , updateAlert , listAlert} from "@/api/alert/alert";
 import print from 'print-js'
 
 export default {
@@ -476,28 +487,116 @@ export default {
         // 上传的地址
         url: process.env.VUE_APP_BASE_API + "/fire/firefighting/importData"
       },
-      width: ''
+      width: '',
+      alertform: {
+        id: null,
+        fireId: null,
+        deviceName: null,
+        deviceModel: null,
+        locate: null,
+        alertRecord: null,
+        alertTime: null,
+        createBy: null,
+        createTime: null,
+        updateBy: null,
+        updateTime: null
+      },
+      fireIDNumber: [],
+      queryParams2: {
+        pageNum: 1,
+        pageSize: 10,
+        fireId: null,
+        deviceName: null,
+        deviceModel: null,
+        locate: null,
+        alertRecord: null,
+        alertTime: null,
+      },
     };
   },
   created() {
     this.getList();
   },
-  computed: {
-    tabStyle() {
-      return {
-        width: this.width // 使用计算属性来绑定宽度
-      };
-    }
-  },
+  // computed: {
+  //   tabStyle() {
+  //     return {
+  //       width: this.width // 使用计算属性来绑定宽度
+  //     };
+  //   }
+  // },
   methods: {
     /** 查询消防设施管理列表 */
     getList() {
       this.loading = true;
       listFirefighting(this.queryParams).then(response => {
+        var alert={}
+        // 过期状态判断 更新数据库
+        for(var i=0;i<response.total;i++){
+          //更新报警记录数据库表
+          alert['fireId'] = response.rows[i].fireId;
+          alert['deviceName'] = response.rows[i].deviceName;
+          alert['deviceModel'] = response.rows[i].deviceModel;
+          alert['locate'] = response.rows[i].locate;
+          //查询已有报警数据的fireId
+          listAlert(this.queryParams2).then(r => {
+            for(var j=0;j<r.total;j++){
+              this.fireIDNumber.push(r.rows[j].fireId) ;
+              console.log(this.fireIDNumber)
+            }  
+          });
+
+          const staticDate = new Date(response.rows[i].expiryDate);
+          if(response.rows[i].expiryDate == null ){
+            response.rows[i].status="无"
+            updateFirefighting(response.rows[i]).then(); 
+
+            alert['alertRecord'] = "消防设施设备异常(消防设备无过期时间)";
+            console.log(JSON.stringify(alert))
+            
+            
+            //判断报警数据库表要更新还是新增
+            if(this.fireIDNumber.includes(alert['fireId'] )){
+              updateAlert(alert).then(res => {
+                console.log(res)
+              });
+            }else{
+              addAlert(alert).then(res => {
+                console.log(res)
+              });
+            }
+            
+          }else if(staticDate < new Date()){
+            response.rows[i].status="否"
+            updateFirefighting(response.rows[i]).then(); 
+
+            alert['alertRecord'] = "到期未点检";
+            console.log(JSON.stringify(alert))
+
+            //判断报警数据库表要更新还是新增
+            if(this.fireIDNumber.includes(alert['fireId'] )){
+              updateAlert(alert).then(res => {
+                console.log(res)
+              });
+            }else{
+              addAlert(alert).then(res => {
+                console.log(res)
+              });
+            }
+
+
+          }else if(staticDate > new Date()){
+            response.rows[i].status="是"
+            updateFirefighting(response.rows[i]).then(); 
+          }else {  }
+
+          
+        }
+
         this.firefightingList = response.rows;
         this.total = response.total;
         this.loading = false;
       });
+ 
     },
     // 取消按钮
     cancel() {
@@ -599,7 +698,7 @@ export default {
 
         // console.log(JSON.stringify(this.srcList))
       })
-      this.width ='1673px'
+      // this.width ='1673px'
     },
     /** 新增按钮操作 */
     handleAdd() {
@@ -693,7 +792,12 @@ export default {
       // 关闭文档写入，并打印
       printWindow.document.close();
       printWindow.print();
-    }
+
+      // setTimeout(() => {
+      //   console.log('这段代码在3秒后执行')
+      // }, 3000);
+    },
+  
   }
 };
 </script>

@@ -116,7 +116,7 @@
       <el-table-column label="放置位置" align="center" prop="locate" />
       <el-table-column label="是否点检" align="center" prop="pointCheck" />
       <el-table-column label="检查时间" align="center" prop="checkRecords" />
-      <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
+      <!-- <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
             size="mini"
@@ -133,7 +133,7 @@
             v-hasPermi="['record:record:remove']"
           >删除</el-button>
         </template>
-      </el-table-column>
+      </el-table-column> -->
     </el-table>
     
     <pagination
@@ -147,9 +147,9 @@
     <!-- 添加或修改检查记录对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-        <el-form-item label="${comment}" prop="fireId">
+        <!-- <el-form-item label="${comment}" prop="fireId">
           <el-input v-model="form.fireId" placeholder="请输入${comment}" />
-        </el-form-item>
+        </el-form-item> -->
         <el-form-item label="设备名称" prop="deviceName">
           <el-input v-model="form.deviceName" placeholder="请输入设备名称" />
         </el-form-item>
