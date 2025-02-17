@@ -414,7 +414,7 @@ export default {
       // 非多个禁用
       multiple: true,
       // 显示搜索条件
-      showSearch: true,
+      showSearch: false,
       // 总条数
       total: 0,
       // 消防设施管理表格数据
@@ -511,11 +511,19 @@ export default {
         locate: null,
         alertRecord: null,
         alertTime: null,
+        id:null
       },
     };
   },
   created() {
-    this.getList();
+    //查询已有报警数据的fireId
+    listAlert(this.queryParams2).then(r => {
+      for(var j=0;j<r.total;j++){
+        this.fireIDNumber.push(r.rows[j].fireId) ;
+      }             
+      console.log(this.fireIDNumber)
+    });
+    this.getList(); 
   },
   // computed: {
   //   tabStyle() {
@@ -529,40 +537,35 @@ export default {
     getList() {
       this.loading = true;
       listFirefighting(this.queryParams).then(response => {
-        var alert={}
-        // 过期状态判断 更新数据库
+        // 过期状态判断 更新数据库 4
         for(var i=0;i<response.total;i++){
           //更新报警记录数据库表
+          var alert={};
           alert['fireId'] = response.rows[i].fireId;
           alert['deviceName'] = response.rows[i].deviceName;
           alert['deviceModel'] = response.rows[i].deviceModel;
           alert['locate'] = response.rows[i].locate;
-          //查询已有报警数据的fireId
-          listAlert(this.queryParams2).then(r => {
-            for(var j=0;j<r.total;j++){
-              this.fireIDNumber.push(r.rows[j].fireId) ;
-              console.log(this.fireIDNumber)
-            }  
-          });
 
           const staticDate = new Date(response.rows[i].expiryDate);
+          // console.log(staticDate)
+          console.log("staticDate < new Date()"+staticDate < new Date())
           if(response.rows[i].expiryDate == null ){
             response.rows[i].status="无"
             updateFirefighting(response.rows[i]).then(); 
 
             alert['alertRecord'] = "消防设施设备异常(消防设备无过期时间)";
-            console.log(JSON.stringify(alert))
+            console.log("alert"+JSON.stringify(alert))
             
-            
+            const index = this.fireIDNumber.indexOf(alert['fireId'] );
+            // console.log(index !== -1); // 输出：true
+            // console.log(this.fireIDNumber.includes(response.rows[i].fireId))
             //判断报警数据库表要更新还是新增
-            if(this.fireIDNumber.includes(alert['fireId'] )){
-              updateAlert(alert).then(res => {
-                console.log(res)
-              });
+            if(index !== -1){
+              console.log("updateAlert")
+              updateAlert(alert).then( );
             }else{
-              addAlert(alert).then(res => {
-                console.log(res)
-              });
+              console.log("addAlert")
+              addAlert(alert).then( );
             }
             
           }else if(staticDate < new Date()){
@@ -571,15 +574,19 @@ export default {
 
             alert['alertRecord'] = "到期未点检";
             console.log(JSON.stringify(alert))
-
+            console.log(response.rows[i].fireId)
+            console.log(this.fireIDNumber.includes(response.rows[i].fireId))
+ 
             //判断报警数据库表要更新还是新增
-            if(this.fireIDNumber.includes(alert['fireId'] )){
+            if(this.fireIDNumber.includes(response.rows[i].fireId)){
               updateAlert(alert).then(res => {
                 console.log(res)
+                console.log("updateAlert")
               });
             }else{
               addAlert(alert).then(res => {
                 console.log(res)
+                console.log("addAlert")
               });
             }
 
