@@ -50,6 +50,22 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
+      <el-form-item label="是否合格" prop="qualified">
+        <el-input
+          v-model="queryParams.qualified"
+          placeholder="请输入是否合格"
+          clearable
+          @keyup.enter.native="handleQuery"
+        />
+      </el-form-item>
+      <!-- <el-form-item label="反馈信息" prop="feedback">
+        <el-input
+          v-model="queryParams.feedback"
+          placeholder="请输入反馈信息"
+          clearable
+          @keyup.enter.native="handleQuery"
+        />
+      </el-form-item> -->
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
         <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
@@ -116,6 +132,8 @@
       <el-table-column label="放置位置" align="center" prop="locate" />
       <el-table-column label="是否点检" align="center" prop="pointCheck" />
       <el-table-column label="检查时间" align="center" prop="checkRecords" />
+      <el-table-column label="是否合格" align="center" prop="qualified" />
+      <el-table-column label="反馈信息" align="center" prop="feedback" />
       <!-- <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
@@ -165,6 +183,12 @@
         <el-form-item label="检查时间" prop="checkRecords">
           <el-input v-model="form.checkRecords" placeholder="请输入检查时间" />
         </el-form-item>
+        <el-form-item label="是否合格" prop="qualified">
+          <el-input v-model="form.qualified" placeholder="请输入是否合格" />
+        </el-form-item>
+        <el-form-item label="反馈信息" prop="feedback">
+          <el-input v-model="form.feedback" placeholder="请输入反馈信息" />
+        </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button type="primary" @click="submitForm">确 定</el-button>
@@ -209,6 +233,8 @@ export default {
         locate: null,
         pointCheck: null,
         checkRecords: null,
+        qualified: null,
+        feedback: null,
       },
       // 表单参数
       form: {},
@@ -249,6 +275,8 @@ export default {
         locate: null,
         pointCheck: null,
         checkRecords: null,
+        qualified: null,
+        feedback: null,
         createBy: null,
         createTime: null,
         updateBy: null,

@@ -33,15 +33,15 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <!--      <el-form-item label="设备分组" prop="group">
+      <el-form-item label="设备分组" prop="deviceGroup">
         <el-input
-          v-model="queryParams.group"
+          v-model="queryParams.deviceGroup"
           placeholder="请输入设备分组"
           clearable
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="生产日期" prop="productDate">
+      <!--      <el-form-item label="生产日期" prop="productDate">
         <el-date-picker clearable
           v-model="queryParams.productDate"
           type="date"
@@ -181,7 +181,7 @@
           <span>{{ parseTime(scope.row.installTime, '{y}-{m}-{d}') }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="到期时间" align="center" prop="expiryDate" width="180">
+      <el-table-column label="到期时间" align="center" prop="expiryDate" width="150">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.expiryDate, '{y}-{m}-{d}') }}</span>
         </template>
@@ -193,14 +193,14 @@
           <image-preview :src="scope.row.image" :width="50" :height="50"/>
         </template>
       </el-table-column>
+      <el-table-column label="设备分组" align="center" prop="deviceGroup" />
       <el-table-column label="二维码内容" align="center" prop="qrContent" width="120" />
        <!-- <el-table-column label="灭火器ID" align="center" prop="killFireId" />
       <el-table-column label="消火栓ID" align="center" prop="fireHydrantId" />
       <el-table-column label="水泵房ID" align="center" prop="pumpRoomId" />
-      <el-table-column label="阀组间ID" align="center" prop="groupRoomId" />
-      <el-table-column label="设备分组" align="center" prop="group" />
-      <el-table-column label="检查记录" align="center" prop="checkRecords" width="95" />
-      <el-table-column label="维护记录" align="center" prop="maintainRecords" />
+      <el-table-column label="阀组间ID" align="center" prop="groupRoomId" />-->
+      <el-table-column label="最新检查时间" align="center" prop="checkRecords" width="100" />
+     <!-- <el-table-column label="维护记录" align="center" prop="maintainRecords" />
       <el-table-column label="报警数据" align="center" prop="alarmData" /> -->
       <!-- <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
@@ -309,8 +309,8 @@
         <el-form-item label="阀组间ID" prop="groupRoomId">
           <el-input v-model="form.groupRoomId" placeholder="请输入阀组间ID" />
         </el-form-item>
-        <el-form-item label="设备分组" prop="group">
-          <el-input v-model="form.group" placeholder="请输入设备分组" />
+        <el-form-item label="设备分组" prop="deviceGroup">
+          <el-input v-model="form.deviceGroup" placeholder="请输入设备分组" />
         </el-form-item>
         <el-form-item label="检查记录" prop="checkRecords">
           <el-input v-model="form.checkRecords" placeholder="请输入检查记录" />
@@ -364,7 +364,7 @@
       <section ref="pform" id="printMe" style="margin-top: 50px;margin-bottom: 50px;">
         
           <!-- <div class="el-row" style="height: 2.4cm; width: 10cm;padding-top: 3mm"> -->
-<!-- 
+          <!-- 
             <div class="item-long" >
               <div class="el-col el-col-3 el-col-offset-0">
                 <div class="narrow">{{firefightingList.qrcode}}</div>
@@ -461,7 +461,7 @@ export default {
         fireHydrantId: null,
         pumpRoomId: null,
         groupRoomId: null,
-        group: null,
+        deviceGroup: null,
         checkRecords: null,
         maintainRecords: null,
         alarmData: null,
@@ -548,31 +548,43 @@ export default {
 
           const staticDate = new Date(response.rows[i].expiryDate);
           // console.log(staticDate)
-          console.log("staticDate < new Date()"+staticDate < new Date())
+          // console.log("staticDate < new Date()"+staticDate < new Date())
           if(response.rows[i].expiryDate == null ){
             response.rows[i].status="无"
             updateFirefighting(response.rows[i]).then(); 
 
-            alert['alertRecord'] = "消防设施设备异常(消防设备无过期时间)";
+            alert['alertRecord'] = "设备异常(无过期时间)";
             console.log("alert"+JSON.stringify(alert))
             
-            const index = this.fireIDNumber.indexOf(alert['fireId'] );
+            // const index = this.fireIDNumber.indexOf(alert['fireId'] );
             // console.log(index !== -1); // 输出：true
             // console.log(this.fireIDNumber.includes(response.rows[i].fireId))
+            // //判断报警数据库表要更新还是新增
+            // if(index !== -1){
+            //   console.log("updateAlert")
+            //   updateAlert(alert).then( );
+            // }else{
+            //   console.log("addAlert")
+            //   addAlert(alert).then( );
+            // }
             //判断报警数据库表要更新还是新增
-            if(index !== -1){
-              console.log("updateAlert")
-              updateAlert(alert).then( );
+            if(this.fireIDNumber.includes(response.rows[i].fireId)){
+              updateAlert(alert).then(res => {
+                console.log(res)
+                console.log("updateAlert")
+              });
             }else{
-              console.log("addAlert")
-              addAlert(alert).then( );
+              addAlert(alert).then(res => {
+                console.log(res)
+                console.log("addAlert")
+              });
             }
             
           }else if(staticDate < new Date()){
             response.rows[i].status="否"
             updateFirefighting(response.rows[i]).then(); 
 
-            alert['alertRecord'] = "到期未点检";
+            alert['alertRecord'] = "设备已到期";
             console.log(JSON.stringify(alert))
             console.log(response.rows[i].fireId)
             console.log(this.fireIDNumber.includes(response.rows[i].fireId))
@@ -628,7 +640,7 @@ export default {
         fireHydrantId: null,
         pumpRoomId: null,
         groupRoomId: null,
-        group: null,
+        deviceGroup: null,
         checkRecords: null,
         maintainRecords: null,
         alarmData: null,
@@ -663,8 +675,8 @@ export default {
     qrGenerate(row){
       // const fireId = row.fireId || this.ids
       // console.log(fireId)
-      console.log(JSON.stringify( this.firefightingList))
-      console.log(JSON.stringify( row))
+      // console.log(JSON.stringify( this.firefightingList))
+      // console.log(JSON.stringify( row))
 
       qrImg(this.firefightingList[this.index].qrContent).then(response => {
         // console.log(response)
