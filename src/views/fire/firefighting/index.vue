@@ -113,7 +113,7 @@
           v-hasPermi="['fire:firefighting:add']"
         >新增</el-button>
       </el-col>
-      <!-- <el-col :span="1.5">
+      <el-col :span="1.5">
         <el-button
           type="success"
           plain
@@ -123,7 +123,7 @@
           @click="handleUpdate"
           v-hasPermi="['fire:firefighting:edit']"
         >修改</el-button>
-      </el-col> -->
+      </el-col>
       <el-col :span="1.5">
         <el-button
           type="danger"
@@ -520,7 +520,7 @@ export default {
     listAlert(this.queryParams2).then(r => {
       for(var j=0;j<r.total;j++){
         this.fireIDNumber.push(r.rows[j].fireId) ;
-      }             
+      }
       console.log(this.fireIDNumber)
     });
     this.getList(); 
@@ -569,6 +569,23 @@ export default {
             // }
             //判断报警数据库表要更新还是新增
             if(this.fireIDNumber.includes(response.rows[i].fireId)){
+              // this.queryParams2.fireId = response.rows[i].fireId
+              // listAlert(this.queryParams2).then(r=>{
+              //   console.log('1 r.alertTime'+r.rows.alertTime)
+              //   if(r.rows.alertTime > new Date() ){
+              //     addAlert(alert).then(res => {
+              //       console.log(res)
+              //       console.log("addAlert")
+              //     });
+              //   }else if(r.rows.alertTime = new Date()){
+                  
+              //   }else{
+              //     updateAlert(alert).then(res => {
+              //       console.log(res)
+              //       console.log("updateAlert")
+              //     });
+              //   }
+              // })
               updateAlert(alert).then(res => {
                 console.log(res)
                 console.log("updateAlert")
@@ -591,6 +608,23 @@ export default {
  
             //判断报警数据库表要更新还是新增
             if(this.fireIDNumber.includes(response.rows[i].fireId)){
+              // this.queryParams2.fireId = response.rows[i].fireId
+              // listAlert(this.queryParams2).then(r=>{
+              //   console.log('2 r.alertTime'+r.rows.alertTime)
+              //   if(r.rows.alertTime > new Date()){
+              //     addAlert(alert).then(res => {
+              //       console.log(res)
+              //       console.log("addAlert")
+              //     });
+              //   }else if(r.rows.alertTime = new Date()){
+                  
+              //   }else{
+              //     updateAlert(alert).then(res => {
+              //       console.log(res)
+              //       console.log("updateAlert")
+              //     });
+              //   }
+              // })
               updateAlert(alert).then(res => {
                 console.log(res)
                 console.log("updateAlert")
@@ -810,11 +844,10 @@ export default {
       
       // 关闭文档写入，并打印
       printWindow.document.close();
-      printWindow.print();
 
-      // setTimeout(() => {
-      //   console.log('这段代码在3秒后执行')
-      // }, 3000);
+      setTimeout(() => {
+        printWindow.print();
+      }, 1000);
     },
   
   }

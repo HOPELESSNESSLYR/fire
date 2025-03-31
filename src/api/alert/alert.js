@@ -22,7 +22,8 @@ export function addAlert(data) {
   return request({
     url: '/alert/alert',
     method: 'post',
-    data: data
+    data: data,
+    headers: {skipRepeatSubmit: true}
   })
 }
 
@@ -31,7 +32,8 @@ export function updateAlert(data) {
   return request({
     url: '/alert/alert',
     method: 'put',
-    data: data
+    data: data,
+    headers: {skipRepeatSubmit: true}
   })
 }
 
