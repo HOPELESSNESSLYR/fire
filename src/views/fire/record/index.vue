@@ -132,6 +132,11 @@
       <el-table-column label="放置位置" align="center" prop="locate" />
       <el-table-column label="是否点检" align="center" prop="pointCheck" />
       <el-table-column label="检查时间" align="center" prop="checkRecords" />
+      <el-table-column label="设备图片" align="center" prop="image" width="100">
+        <template slot-scope="scope">
+          <image-preview :src="scope.row.image" :width="50" :height="50"/>
+        </template>
+      </el-table-column>
       <el-table-column label="是否合格" align="center" prop="qualified" />
       <el-table-column label="反馈信息" align="center" prop="feedback" />
       <!-- <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
@@ -183,6 +188,9 @@
         <el-form-item label="检查时间" prop="checkRecords">
           <el-input v-model="form.checkRecords" placeholder="请输入检查时间" />
         </el-form-item>
+        <el-form-item label="设备图片" prop="image">
+          <image-upload v-model="form.image"/>
+        </el-form-item>
         <el-form-item label="是否合格" prop="qualified">
           <el-input v-model="form.qualified" placeholder="请输入是否合格" />
         </el-form-item>
@@ -233,6 +241,7 @@ export default {
         locate: null,
         pointCheck: null,
         checkRecords: null,
+        image: null,
         qualified: null,
         feedback: null,
       },
@@ -275,6 +284,7 @@ export default {
         locate: null,
         pointCheck: null,
         checkRecords: null,
+        image: null,
         qualified: null,
         feedback: null,
         createBy: null,

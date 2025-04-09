@@ -839,12 +839,12 @@ export default {
       // 循环并写入图片
       images.forEach(function(image) {
         var imgTag = '<img src="' + image + '" />';
+        // var imgTag = '<img src="' + image + '" />'+ '<span>这是'+ row.deviceName +' 的描述</span>';
         printWindow.document.write(imgTag);
       });
       
       // 关闭文档写入，并打印
       printWindow.document.close();
-
       setTimeout(() => {
         printWindow.print();
       }, 1000);
