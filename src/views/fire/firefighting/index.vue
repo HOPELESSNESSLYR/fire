@@ -155,6 +155,15 @@
           v-hasPermi="['fire:firefighting:export']"
         >导出</el-button>
       </el-col>
+      <!-- <el-col :span="1.5">
+        <el-button
+          type="primary"
+          plain
+          icon="el-icon-bell"
+          size="mini"
+          @click="handleAlert"
+        >生成最新预警</el-button>
+      </el-col> -->
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
@@ -294,6 +303,9 @@
         <el-form-item label="设备图片" prop="image">
           <image-upload v-model="form.image"/>
         </el-form-item>
+        <el-form-item label="设备分组" prop="deviceGroup">
+          <el-input v-model="form.deviceGroup" placeholder="请输入设备分组" />
+        </el-form-item>
         <el-form-item label="二维码内容" prop="qrContent">
           <el-input v-model="form.qrContent" placeholder="请输入二维码内容" />
         </el-form-item>
@@ -308,9 +320,6 @@
         </el-form-item>
         <el-form-item label="阀组间ID" prop="groupRoomId">
           <el-input v-model="form.groupRoomId" placeholder="请输入阀组间ID" />
-        </el-form-item>
-        <el-form-item label="设备分组" prop="deviceGroup">
-          <el-input v-model="form.deviceGroup" placeholder="请输入设备分组" />
         </el-form-item>
         <el-form-item label="检查记录" prop="checkRecords">
           <el-input v-model="form.checkRecords" placeholder="请输入检查记录" />
@@ -501,10 +510,12 @@ export default {
         updateBy: null,
         updateTime: null
       },
+      //已有报警数据的fireId alerttime
       fireIDNumber: [],
+      alertTimes: [],
       queryParams2: {
         pageNum: 1,
-        pageSize: 10,
+        pageSize: 100,
         fireId: null,
         deviceName: null,
         deviceModel: null,
@@ -516,13 +527,6 @@ export default {
     };
   },
   created() {
-    //查询已有报警数据的fireId
-    listAlert(this.queryParams2).then(r => {
-      for(var j=0;j<r.total;j++){
-        this.fireIDNumber.push(r.rows[j].fireId) ;
-      }
-      console.log(this.fireIDNumber)
-    });
     this.getList(); 
   },
   // computed: {
@@ -533,8 +537,28 @@ export default {
   //   }
   // },
   methods: {
+    handleAlert(){
+    //查询已有报警数据的fireId
+    listAlert(this.queryParams2).then(r => {
+      if(r.total>100){
+        // alert("请导出并清除报警数据")
+        for(var j=0;j<100;j++){
+          this.fireIDNumber.push(r.rows[j].fireId) ;
+          this.alertTimes.push(r.rows[j].alertTime)
+        }
+      }else{
+        for(var j=0;j<r.total;j++){
+          this.fireIDNumber.push(r.rows[j].fireId) ;
+          this.alertTimes.push(r.rows[j].alertTime)
+        }
+        console.log(this.alertTimes)
+        console.log(this.getCurrentDate())
+      }
+    });
+    },
     /** 查询消防设施管理列表 */
-    getList() {
+    async getList() {
+      await this.handleAlert();
       this.loading = true;
       listFirefighting(this.queryParams).then(response => {
         // 过期状态判断 更新数据库 4
@@ -554,7 +578,6 @@ export default {
             updateFirefighting(response.rows[i]).then(); 
 
             alert['alertRecord'] = "设备异常(无过期时间)";
-            console.log("alert"+JSON.stringify(alert))
             
             // const index = this.fireIDNumber.indexOf(alert['fireId'] );
             // console.log(index !== -1); // 输出：true
@@ -567,8 +590,12 @@ export default {
             //   console.log("addAlert")
             //   addAlert(alert).then( );
             // }
+
+          console.log( this.alertTimes.indexOf(this.getCurrentDate())!== -1)
+          console.log(this.fireIDNumber.indexOf(alert['fireId']) !== -1)
+
             //判断报警数据库表要更新还是新增
-            if(this.fireIDNumber.includes(response.rows[i].fireId)){
+            if(this.fireIDNumber.indexOf(alert['fireId']) !== -1 && this.alertTimes.indexOf(this.getCurrentDate())!== -1  ){
               // this.queryParams2.fireId = response.rows[i].fireId
               // listAlert(this.queryParams2).then(r=>{
               //   console.log('1 r.alertTime'+r.rows.alertTime)
@@ -587,12 +614,12 @@ export default {
               //   }
               // })
               updateAlert(alert).then(res => {
-                console.log(res)
+                // console.log(res)
                 console.log("updateAlert")
               });
             }else{
               addAlert(alert).then(res => {
-                console.log(res)
+                // console.log(res)
                 console.log("addAlert")
               });
             }
@@ -603,11 +630,15 @@ export default {
 
             alert['alertRecord'] = "设备已到期";
             console.log(JSON.stringify(alert))
-            console.log(response.rows[i].fireId)
-            console.log(this.fireIDNumber.includes(response.rows[i].fireId))
- 
+            console.log(JSON.stringify(this.fireIDNumber))
+            console.log(this.fireIDNumber.indexOf(alert['fireId']) !== -1)
+            console.log(JSON.stringify(this.alertTimes))
+            console.log(this.getCurrentDate())
+            console.log( this.alertTimes.indexOf(this.getCurrentDate())!== -1)
+            
+            
             //判断报警数据库表要更新还是新增
-            if(this.fireIDNumber.includes(response.rows[i].fireId)){
+            if(this.fireIDNumber.indexOf(alert['fireId']) !== -1 && this.alertTimes.indexOf(this.getCurrentDate())!== -1 ){
               // this.queryParams2.fireId = response.rows[i].fireId
               // listAlert(this.queryParams2).then(r=>{
               //   console.log('2 r.alertTime'+r.rows.alertTime)
@@ -626,12 +657,12 @@ export default {
               //   }
               // })
               updateAlert(alert).then(res => {
-                console.log(res)
+                // console.log(res)
                 console.log("updateAlert")
               });
             }else{
               addAlert(alert).then(res => {
-                console.log(res)
+                // console.log(res)
                 console.log("addAlert")
               });
             }
@@ -849,7 +880,14 @@ export default {
         printWindow.print();
       }, 1000);
     },
-  
+    //当前日期
+    getCurrentDate() {
+      const date = new Date();
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0'); // 月份是从0开始的，所以要加1，并且需要补0
+      const day = String(date.getDate()).padStart(2, '0'); // 日期补0
+      return `${year}-${month}-${day}`;
+    }
   }
 };
 </script>
