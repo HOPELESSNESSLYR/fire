@@ -36,6 +36,15 @@ export function updateAlert(data) {
     headers: {skipRepeatSubmit: true}
   })
 }
+// 修改预警报警
+export function updateAlert2(data) {
+  return request({
+    url: '/alert/alert/update2',
+    method: 'put',
+    data: data,
+    headers: {skipRepeatSubmit: true}
+  })
+}
 
 // 删除预警报警
 export function delAlert(id) {

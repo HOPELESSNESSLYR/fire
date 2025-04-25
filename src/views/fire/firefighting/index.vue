@@ -403,7 +403,7 @@
 <script>
 import { listFirefighting, getFirefighting, delFirefighting, addFirefighting, updateFirefighting, qrImg, qrImgList} from "@/api/fire/firefighting";
 import { getToken, setToken, removeToken } from '@/utils/auth'
-import { addAlert , updateAlert , listAlert} from "@/api/alert/alert";
+import { addAlert , updateAlert , listAlert , updateAlert2 } from "@/api/alert/alert";
 import print from 'print-js'
 
 export default {
@@ -613,9 +613,9 @@ export default {
               //     });
               //   }
               // })
-              updateAlert(alert).then(res => {
+              updateAlert2(alert).then(res => {
                 // console.log(res)
-                console.log("updateAlert")
+                console.log("updateAlert2")
               });
             }else{
               addAlert(alert).then(res => {
@@ -656,9 +656,9 @@ export default {
               //     });
               //   }
               // })
-              updateAlert(alert).then(res => {
+              updateAlert2(alert).then(res => {
                 // console.log(res)
-                console.log("updateAlert")
+                console.log("updateAlert2")
               });
             }else{
               addAlert(alert).then(res => {
