@@ -551,8 +551,8 @@ export default {
           this.fireIDNumber.push(r.rows[j].fireId) ;
           this.alertTimes.push(r.rows[j].alertTime)
         }
-        console.log(this.alertTimes)
-        console.log(this.getCurrentDate())
+        // console.log(this.alertTimes)
+        // console.log(this.getCurrentDate())
       }
     });
     },
@@ -560,9 +560,17 @@ export default {
     async getList() {
       await this.handleAlert();
       this.loading = true;
+      // this.queryParams.pageSize= 100
       listFirefighting(this.queryParams).then(response => {
         // 过期状态判断 更新数据库 4
-        for(var i=0;i<response.total;i++){
+        // if(response.total > 10){
+        //   var totols= 10
+        // }else{
+        //   // var totols= response.total
+        //   var totols= response.rows.length
+        // }
+        for(var i=0;i<response.rows.length;i++){
+          // console.log(response.rows[i].fireId)
           //更新报警记录数据库表
           var alert={};
           alert['fireId'] = response.rows[i].fireId;
@@ -591,8 +599,8 @@ export default {
             //   addAlert(alert).then( );
             // }
 
-          console.log( this.alertTimes.indexOf(this.getCurrentDate())!== -1)
-          console.log(this.fireIDNumber.indexOf(alert['fireId']) !== -1)
+          // console.log( this.alertTimes.indexOf(this.getCurrentDate())!== -1)
+          // console.log(this.fireIDNumber.indexOf(alert['fireId']) !== -1)
 
             //判断报警数据库表要更新还是新增
             if(this.fireIDNumber.indexOf(alert['fireId']) !== -1 && this.alertTimes.indexOf(this.getCurrentDate())!== -1  ){
@@ -615,12 +623,12 @@ export default {
               // })
               updateAlert2(alert).then(res => {
                 // console.log(res)
-                console.log("updateAlert2")
+                // console.log("updateAlert2")
               });
             }else{
               addAlert(alert).then(res => {
                 // console.log(res)
-                console.log("addAlert")
+                // console.log("addAlert")
               });
             }
             
@@ -629,12 +637,12 @@ export default {
             updateFirefighting(response.rows[i]).then(); 
 
             alert['alertRecord'] = "设备已到期";
-            console.log(JSON.stringify(alert))
-            console.log(JSON.stringify(this.fireIDNumber))
-            console.log(this.fireIDNumber.indexOf(alert['fireId']) !== -1)
-            console.log(JSON.stringify(this.alertTimes))
-            console.log(this.getCurrentDate())
-            console.log( this.alertTimes.indexOf(this.getCurrentDate())!== -1)
+            // console.log(JSON.stringify(alert))
+            // console.log(JSON.stringify(this.fireIDNumber))
+            // console.log(this.fireIDNumber.indexOf(alert['fireId']) !== -1)
+            // console.log(JSON.stringify(this.alertTimes))
+            // console.log(this.getCurrentDate())
+            // console.log( this.alertTimes.indexOf(this.getCurrentDate())!== -1)
             
             
             //判断报警数据库表要更新还是新增
@@ -658,12 +666,12 @@ export default {
               // })
               updateAlert2(alert).then(res => {
                 // console.log(res)
-                console.log("updateAlert2")
+                // console.log("updateAlert2")
               });
             }else{
               addAlert(alert).then(res => {
                 // console.log(res)
-                console.log("addAlert")
+                // console.log("addAlert")
               });
             }
 
@@ -675,7 +683,6 @@ export default {
 
           
         }
-
         this.firefightingList = response.rows;
         this.total = response.total;
         this.loading = false;
@@ -729,9 +736,9 @@ export default {
     },
     // 多选框选中数据
     handleSelectionChange(selection) {
-      console.log(JSON.stringify(selection))
+      // console.log(JSON.stringify(selection))
       this.ids = selection.map(item => item.fireId)
-      console.log(this.ids)
+      // console.log(this.ids)
       this.single = selection.length!==1
       this.multiple = !selection.length
 
@@ -748,27 +755,27 @@ export default {
         this.url[0]="data:img/jpg;base64,"+ response;
         this.firefightingList[this.index].qrcode="data:img/jpg;base64,"+ response;
         row.qrcode = this.url[0]
-        console.log(row.qrcode)
-        console.log(this.firefightingList[this.index].qrcode)
+        // console.log(row.qrcode)
+        // console.log(this.firefightingList[this.index].qrcode)
         this.srcList= [ row.qrcode];
       });
     },
     qrPrint(row){
-      console.log(JSON.stringify( row))
+      // console.log(JSON.stringify( row))
       this.printImages(this.srcList);
     },
     onImageLoad() {   // 触发图片预览
       // this.$el.querySelector('.el-image__inner').click();
     },
     qrGenerateList(row){
-      console.log(JSON.stringify( row))
+      // console.log(JSON.stringify( row))
       // 传入 二维码内容 列表
       var qrContents=[]
       for(let i=0;i<this.ids.length;i++){
         qrContents[i] =this.firefightingList[i].qrContent
         // console.log(qrContents[i])
       }
-      console.log(JSON.stringify( qrContents ))
+      // console.log(JSON.stringify( qrContents ))
       
       qrImgList(qrContents).then(response =>{
         for(let i=0;i<this.ids.length;i++){
