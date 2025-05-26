@@ -757,11 +757,15 @@ export default {
         row.qrcode = this.url[0]
         // console.log(row.qrcode)
         // console.log(this.firefightingList[this.index].qrcode)
-        this.srcList= [ row.qrcode];
+        
+        if(this.srcList !=null){
+          this.srcList.push(row.qrcode)
+        }else{
+          this.srcList= [ row.qrcode];
+        }
       });
     },
     qrPrint(row){
-      // console.log(JSON.stringify( row))
       this.printImages(this.srcList);
     },
     onImageLoad() {   // 触发图片预览
