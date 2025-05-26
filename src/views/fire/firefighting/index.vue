@@ -1,7 +1,7 @@
 <template>
   <div class="app-container">
     <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
-      <el-form-item label="设备名称" prop="deviceName">
+      <!-- <el-form-item label="设备名称" prop="deviceName">
         <el-input
           v-model="queryParams.deviceName"
           placeholder="请输入设备名称"
@@ -16,7 +16,7 @@
           clearable
           @keyup.enter.native="handleQuery"
         />
-      </el-form-item>
+      </el-form-item> -->
       <el-form-item label="放置位置" prop="locate">
         <el-input
           v-model="queryParams.locate"
@@ -61,6 +61,14 @@
         <el-input
           v-model="queryParams.pointCheck"
           placeholder="请输入是否点检"
+          clearable
+          @keyup.enter.native="handleQuery"
+        />
+      </el-form-item>
+      <el-form-item label="二维码内容" prop="qrContent">
+        <el-input
+          v-model="queryParams.qrContent"
+          placeholder="请输入二维码内容"
           clearable
           @keyup.enter.native="handleQuery"
         />
@@ -171,7 +179,7 @@
       
     <el-table v-loading="loading" :data="firefightingList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="序号" type="index" align="center" prop="index">
+      <el-table-column label="序号" type="index" align="center" prop="index"  width="60">
         <template slot-scope="scope">
           <span>{{(queryParams.pageNum - 1) * queryParams.pageSize + scope.$index + 1}}</span>
         </template>
