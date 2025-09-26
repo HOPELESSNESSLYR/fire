@@ -1,0 +1,9 @@
+# 项目排除路径
+/degson-admin/target/
+/degson-common/target/
+/degson-framework/target/
+/degson-generator/target/
+/degson-quartz/target/
+/degson-system/target/
+/fire/target/
+/degson-ui/node_modules
