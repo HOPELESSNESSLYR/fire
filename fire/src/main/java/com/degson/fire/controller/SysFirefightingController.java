@@ -163,27 +163,6 @@ public class SysFirefightingController extends BaseController
         return list;
     }
 
-    /**
-     * Monthly summary endpoint
-     */
-    @GetMapping("/summary/monthly")
-    public AjaxResult monthlySummary(@RequestParam(required = false) String startDate,
-                                     @RequestParam(required = false) String endDate) {
-        // 中文说明：
-        // 1) 当未传入 startDate/endDate 时，默认取当前自然月的第一天与最后一天。
-        // 2) 调用服务层方法按设备组（灭火器/消防栓/阀组间/水泵房）统计该月：总数、已点检、未点检、合格、不合格。
-        // 3) 返回值为 List<MonthlySummaryVO>，前端用于汇总展示。
-        // default to current month if not provided
-        if (startDate == null || endDate == null) {
-            java.time.LocalDate now = java.time.LocalDate.now();
-            java.time.LocalDate firstDay = now.withDayOfMonth(1);
-            java.time.LocalDate lastDay = now.withDayOfMonth(now.lengthOfMonth());
-            startDate = firstDay.toString();
-            endDate = lastDay.toString();
-        }
-        List<MonthlySummaryVO> data = sysFirefightingService.queryMonthlySummary(startDate, endDate);
-        return success(data);
-    }
 
     /**
      * 新增照片字段
@@ -219,5 +198,28 @@ public class SysFirefightingController extends BaseController
     {
         List<SysFirefighting> list = sysFirefightingService.selectSysFirefightingList(sysFirefighting);
         return getDataTable(list);
+    }
+
+
+    /**
+     * Monthly summary endpoint
+     */
+    @GetMapping("/summary/monthly")
+    public AjaxResult monthlySummary(@RequestParam(required = false) String startDate,
+                                     @RequestParam(required = false) String endDate) {
+        // 中文说明：
+        // 1) 当未传入 startDate/endDate 时，默认取当前自然月的第一天与最后一天。
+        // 2) 调用服务层方法按设备组（灭火器/消防栓/阀组间/水泵房）统计该月：总数、已点检、未点检、合格、不合格。
+        // 3) 返回值为 List<MonthlySummaryVO>，前端用于汇总展示。
+        // default to current month if not provided
+        if (startDate == null || endDate == null) {
+            java.time.LocalDate now = java.time.LocalDate.now();
+            java.time.LocalDate firstDay = now.withDayOfMonth(1);
+            java.time.LocalDate lastDay = now.withDayOfMonth(now.lengthOfMonth());
+            startDate = firstDay.toString();
+            endDate = lastDay.toString();
+        }
+        List<MonthlySummaryVO> data = sysFirefightingService.queryMonthlySummary(startDate, endDate);
+        return success(data);
     }
 }

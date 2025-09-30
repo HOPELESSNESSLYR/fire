@@ -188,11 +188,6 @@ export default {
       }
     },
 
-    /** 提交按钮 */
-    submitForm() {
-
-    },
-
     //本月
     getCurrentDate() {
       const date = new Date();
