@@ -38,6 +38,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <select id="selectSysFirefightingList" parameterType="SysFirefighting" resultMap="SysFirefightingResult">
         <include refid="selectSysFirefightingVo"/>
         <where>
+            <if test="fireId != null"> and fire_id = #{fireId}</if>
             <if test="deviceName != null  and deviceName != ''"> and device_name like concat('%', #{deviceName}, '%')</if>
             <if test="deviceModel != null  and deviceModel != ''"> and device_model = #{deviceModel}</if>
 <!--            <if test="locate != null  and locate != ''"> and locate = #{locate}</if>-->
@@ -69,6 +70,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <insert id="insertSysFirefighting" parameterType="SysFirefighting" useGeneratedKeys="true" keyProperty="fireId">
         insert into sys_firefighting
         <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="fireId != null">fire_id,</if>
             <if test="deviceName != null">device_name,</if>
             <if test="deviceModel != null">device_model,</if>
             <if test="locate != null">locate,</if>
@@ -123,6 +125,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <update id="updateSysFirefighting" parameterType="SysFirefighting">
         update sys_firefighting
         <trim prefix="SET" suffixOverrides=",">
+            <if test="fireId != null">fire_id = #{fireId},</if>
             <if test="deviceName != null">device_name = #{deviceName},</if>
             <if test="deviceModel != null">device_model = #{deviceModel},</if>
             <if test="locate != null">locate = #{locate},</if>

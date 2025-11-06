@@ -18,10 +18,10 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="检查时间" prop="checkRecords">
+      <el-form-item label="反馈信息" prop="feedback">
         <el-input
-          v-model="queryParams.checkRecords"
-          placeholder="请输入检查时间"
+          v-model="queryParams.feedback"
+          placeholder="请输入反馈信息"
           clearable
           @keyup.enter.native="handleQuery"
         />
@@ -66,14 +66,22 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <!-- <el-form-item label="反馈信息" prop="feedback">
-        <el-input
-          v-model="queryParams.feedback"
-          placeholder="请输入反馈信息"
+      <el-form-item label="检查时间" prop="checkRecords">
+        <!-- <el-input
+          v-model="queryParams.checkRecords"
+          placeholder="请输入检查时间"
           clearable
           @keyup.enter.native="handleQuery"
-        />
-      </el-form-item> -->
+        /> -->
+        <el-date-picker
+          v-model="queryParams.checkRecords"
+          type="month"
+          placeholder="请选择检查时间"
+          value-format="yyyy-MM"
+          clearable
+          @keyup.enter.native="handleQuery">
+        </el-date-picker>
+      </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
         <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
@@ -308,6 +316,7 @@ export default {
     /** 搜索按钮操作 */
     handleQuery() {
       this.queryParams.pageNum = 1;
+      console.log(this.queryParams.checkRecords)
       this.getList();
     },
     /** 重置按钮操作 */

@@ -18,6 +18,7 @@ public class SysFirefighting extends BaseEntity
     private static final long serialVersionUID = 1L;
 
     /** 消防设施ID */
+    @Excel(name = "消防设施ID")
     private Long fireId;
 
     /** 设备名称 */

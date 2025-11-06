@@ -23,10 +23,10 @@
     <el-col :span="12">
       <div class="box2">
         <ul>
-        <h3>其中合格的灭火器{{mhqhg}}个，不合格{{mhq - mhqhg}}个。</h3>
-        <h3>其中合格的消防栓{{xhshg}}个，不合格{{xhs - xhshg}}个。</h3>
-        <h3>其中合格的报警阀组{{bjfzhg}}个，不合格{{bjfz - bjfzhg}}个。</h3>
-        <h3>其中合格的泵房{{bfhg}}个，不合格{{bf - bfhg}}个。</h3>   
+        <h3>其中合格的灭火器{{mhqhg}}个，不合格{{mhqdj - mhqhg}}个。</h3>
+        <h3>其中合格的消防栓{{xhshg}}个，不合格{{xhsdj - xhshg}}个。</h3>
+        <h3>其中合格的报警阀组{{bjfzhg}}个，不合格{{bjfzdj - bjfzhg}}个。</h3>
+        <h3>其中合格的泵房{{bfhg}}个，不合格{{bfdj - bfhg}}个。</h3>   
       </ul>
       </div>
       
@@ -37,7 +37,7 @@
 </template>
 
 <script>
-import { listFirefighting, listFirefighting2, delFirefighting, addFirefighting, updateFirefighting, qrImg, qrImgList} from "@/api/fire/firefighting";
+import { listFirefighting, listFirefighting2 } from "@/api/fire/firefighting";
 import { getToken, setToken, removeToken } from '@/utils/auth'
 import { infor ,listRecord} from "@/api/record/record";
 
@@ -45,10 +45,10 @@ export default {
   name: "Firefighting",
   data() {
     return {
-      mhq:0,
+      mhq:1522,
       mhqdj:0,
       mhqhg:0,
-      xhs:0,
+      xhs:302,
       xhsdj:0,
       xhshg:0,
       bjfz:0,
@@ -76,10 +76,10 @@ export default {
     async getList() {
       this.loading = true;
       // 重置统计，避免重复进入页面或刷新造成累计
-      this.mhq = 0;
+      this.mhq = 1522;
       this.mhqdj = 0;
       this.mhqhg = 0;
-      this.xhs = 0;
+      this.xhs = 302;
       this.xhsdj = 0;
       this.xhshg = 0;
       this.bjfz = 0;
@@ -90,7 +90,7 @@ export default {
       this.bfhg = 0;
       try {
         // 并发获取：设备列表 + 当月合格记录列表（单次请求，避免逐条请求导致超时）
-        const [fireRes, recordRes] = await Promise.all([
+        const [fireRes, recordRes,recordRes1,recordRes2,recordRes3,] = await Promise.all([
           listFirefighting2(this.firefighting),
           // 记录列表：按当月与合格筛选，尽量拉取足量数据（如后端分页可用）
           listRecord({
@@ -98,8 +98,8 @@ export default {
             qualified: '合格',
             checkRecords: this.getCurrentDate(),
             pageNum: 1,
-            pageSize: 9999
-          })
+            pageSize: 9999,
+          }),
         ]);
 
         const rows = Array.isArray(fireRes && fireRes.rows) ? fireRes.rows : [];
@@ -115,44 +115,17 @@ export default {
         }
 
         for (let i = 0; i < rows.length; i++) {   // 当月
-          // if(response.rows[i].deviceGroup == "灭火器" && response.rows[i].pointCheck == "是" ){
-          //   this.mhqdj +=1; 
-          //     const record = {
-          //       fireId: response.rows[i].fireId,
-          //       qualified: null,
-          //       checkRecords: this.getCurrentDate(),
-          //     }
-          //     listRecord(record).then(res=>{
-                     
-          //     })
-            
-          // }else if(response.rows[i].deviceGroup == "消防栓" && response.rows[i].pointCheck == "是" ){
-          //   this.xhsdj +=1; 
-          // }else if(response.rows[i].deviceGroup == "阀组间" && response.rows[i].pointCheck == "是" ){
-          //   this.bjfzdj +=1; 
-          // }else if(response.rows[i].deviceGroup == "水泵房" && response.rows[i].pointCheck == "是" ){
-          //   this.bfdj +=1; 
-          // }
           if(rows[i].deviceGroup == "灭火器" ){
-            this.mhq +=1; 
+            // this.mhq +=1; 
             if(rows[i].pointCheck == "是"){
               this.mhqdj +=1; 
-              const record = {
-                fireId: rows[i].fireId,
-                qualified: null,
-                checkRecords: this.getCurrentDate(),
-              }
-              // infor(record).then(res=>{
-                
-              // })
-              // 移除逐条查询，避免大量并发请求导致超时
               // 统计合格数：当月合格记录中包含该 fireId
               if (qualifiedFireIdSet.has(rows[i].fireId)) {
                 this.mhqhg += 1;
               }
             }
           }else if(rows[i].deviceGroup == "消防栓" ){
-            this.xhs +=1; 
+            // this.xhs +=1; 
             if(rows[i].pointCheck == "是" ){
               this.xhsdj +=1; 
               if (qualifiedFireIdSet.has(rows[i].fireId)) {
@@ -160,7 +133,7 @@ export default {
               }
             }
           }else if(rows[i].deviceGroup == "阀组间" ){
-            this.bjfz +=1; 
+            // this.bjfz +=1; 
             if(rows[i].pointCheck == "是" ){
               this.bjfzdj +=1; 
               if (qualifiedFireIdSet.has(rows[i].fireId)) {
@@ -168,7 +141,7 @@ export default {
               }
             }
           }else if(rows[i].deviceGroup == "水泵房" ){
-            this.bf +=1; 
+            // this.bf +=1; 
             if(rows[i].pointCheck == "是" ){
               this.bfdj +=1; 
               if (qualifiedFireIdSet.has(rows[i].fireId)) {
@@ -177,10 +150,7 @@ export default {
             }
           }
         }
-        //   this.firefighting.deviceGroup = "灭火器";
-        // this.firefighting.deviceGroup = "消防栓";
-        // this.firefighting.deviceGroup = "阀组间";
-        // this.firefighting.deviceGroup = "水泵房";
+
       } catch (e) {
         // 接口超时等异常已在全局拦截器提示，这里仅保证页面不崩溃
       } finally {
